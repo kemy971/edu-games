@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(export PATH=\"/opt/homebrew/bin:$PATH\")",
+      "Bash(npx tsc:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Read(//opt/homebrew/Cellar/node/23.9.0/bin/**)",
+      "Bash(/opt/homebrew/bin/node --version)",
+      "WebSearch"
+    ]
+  }
+}
