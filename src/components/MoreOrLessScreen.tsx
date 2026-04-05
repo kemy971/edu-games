@@ -138,8 +138,8 @@ export default function MoreOrLessScreen({ profile, onComplete, onBack }: MoreOr
     <div className="page page-mol">
       <header className="screen-header">
         <BackButton onBack={onBack} label="← Menu" />
+        <h2>Plus ou Moins</h2>
         <div className="score-display">{score.correct} / {QUIZ_CONFIG.questionsPerRound}</div>
-        <div className="header-spacer" />
       </header>
 
       <div className="mol-prompt">

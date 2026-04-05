@@ -92,8 +92,8 @@ export default function SubitizingScreen({ profile, onComplete, onBack }: Subiti
     <div className="page page-quiz">
       <header className="screen-header">
         <BackButton onBack={onBack} label="← Menu" />
+        <h2>Combien ?</h2>
         <div className="score-display">{score.correct} / {QUIZ_CONFIG.questionsPerRound}</div>
-        <div className="header-spacer" />
       </header>
 
       <div className="quiz-prompt">Combien y en a-t-il ?</div>

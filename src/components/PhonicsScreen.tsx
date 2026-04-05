@@ -93,8 +93,8 @@ export default function PhonicsScreen({ profile, onComplete, onBack }: PhonicsSc
     <div className="page page-quiz">
       <header className="screen-header">
         <BackButton onBack={onBack} label="← Menu" />
+        <h2>Phonétique</h2>
         <div className="score-display">{score.correct} / {QUIZ_CONFIG.questionsPerRound}</div>
-        <div className="header-spacer" />
       </header>
 
       <div className="quiz-prompt">

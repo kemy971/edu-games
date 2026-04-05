@@ -103,8 +103,8 @@ export default function TenFrameScreen({ profile, onComplete, onBack }: TenFrame
     <div className="page page-tf">
       <header className="screen-header">
         <BackButton onBack={onBack} label="← Menu" />
+        <h2>Cadre de 10</h2>
         <div className="score-display">{score.correct} / {QUIZ_CONFIG.questionsPerRound}</div>
-        <div className="header-spacer" />
       </header>
 
       <div className="tf-target">

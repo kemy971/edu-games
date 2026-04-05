@@ -100,8 +100,8 @@ export default function QuizScreen({ mode, profile, onComplete, onBack }: QuizSc
     <div className="page page-quiz">
       <header className="screen-header">
         <BackButton onBack={onBack} label="← Menu" />
+        <h2>Quiz</h2>
         <div className="score-display">{score.correct} / {QUIZ_CONFIG.questionsPerRound}</div>
-        <div className="header-spacer" />
       </header>
 
       <div className="quiz-prompt">{question.prompt}</div>

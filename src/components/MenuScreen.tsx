@@ -36,14 +36,13 @@ interface MenuScreenProps {
   onTracing: () => void;
   onMoreOrLess: () => void;
   onTenFrame: () => void;
-  onQuiz: () => void;
 }
 
 export default function MenuScreen({
   profile,
   onAlphabet, onNumbers,
   onMemory, onPhonics, onSubitizing, onTracing: _onTracing,
-  onMoreOrLess, onTenFrame, onQuiz,
+  onMoreOrLess, onTenFrame,
 }: MenuScreenProps) {
   const [mascot, setMascot] = useState(() => {
     try {
@@ -133,13 +132,9 @@ export default function MenuScreen({
           <span className="act-icon">⚖️</span>
           <span>Plus ou Moins</span>
         </button>
-        <button className="activity-btn btn-yellow" onClick={onTenFrame}>
+        <button className="activity-btn btn-yellow wide" onClick={onTenFrame}>
           <span className="act-icon">🔟</span>
           <span>Cadre de 10</span>
-        </button>
-        <button className="activity-btn btn-purple wide" onClick={onQuiz}>
-          <span className="act-icon">🏆</span>
-          <span>Quiz</span>
         </button>
       </div>
     </div>
