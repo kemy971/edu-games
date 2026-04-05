@@ -1177,3 +1177,147 @@ button {
   .tf-name      { font-size: 2.8rem; }
   .tf-emoji     { font-size: 3.6rem; }
 }
+
+/* =============================================
+   COFFRE AU TRÉSOR
+   ============================================= */
+.page-chest {
+  background: linear-gradient(160deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 24px;
+  color: #fff;
+}
+
+.page-chest .screen-header {
+  background: rgba(0,0,0,0.3);
+  border-bottom-color: rgba(255,255,255,0.1);
+}
+.page-chest .btn-back { color: #fff; background: rgba(255,255,255,0.12); }
+.page-chest .screen-header h2 { color: #ffd700; }
+
+.chest-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.chest-lives {
+  display: flex;
+  gap: 6px;
+  font-size: 1.4rem;
+}
+.chest-heart { transition: transform 0.3s, opacity 0.3s; }
+.chest-heart-lost { opacity: 0.4; transform: scale(0.8); }
+
+.chest-icon {
+  font-size: 4.5rem;
+  line-height: 1;
+  transition: transform 0.4s;
+}
+
+@keyframes chest-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-12px) rotate(-5deg); }
+  40% { transform: translateX(12px) rotate(5deg); }
+  60% { transform: translateX(-8px) rotate(-3deg); }
+  80% { transform: translateX(8px) rotate(3deg); }
+}
+.chest-shake { animation: chest-shake 0.45s ease; }
+
+.chest-combo {
+  display: flex;
+  gap: 10px;
+}
+
+.chest-slot {
+  width: 52px;
+  height: 60px;
+  border-radius: 12px;
+  border: 3px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.4);
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.chest-slot:disabled { opacity: 1; }
+.chest-slot-active {
+  border-color: #ffd700;
+  background: rgba(255,215,0,0.12);
+  cursor: pointer;
+  color: #ffd700;
+  animation: pulse-menu 1.2s ease-in-out infinite;
+}
+
+.chest-slot-revealed {
+  border-color: #4ade80;
+  background: rgba(74,222,128,0.15);
+  color: #4ade80;
+  transform: scale(1.05);
+}
+
+.chest-keyboard {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  max-width: 400px;
+  padding: 0 16px 16px;
+  flex-shrink: 0;
+}
+.chest-kb-letters { grid-template-columns: repeat(7, 1fr); }
+.chest-kb-digits  { grid-template-columns: repeat(5, 1fr); }
+
+.chest-key {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, transform 0.1s;
+  border: 2px solid rgba(255,255,255,0.15);
+}
+.chest-key:active { transform: scale(0.9); background: rgba(255,255,255,0.25); }
+
+@keyframes key-flash-correct {
+  0%   { background: rgba(74,222,128,0.5); }
+  100% { background: rgba(255,255,255,0.12); }
+}
+@keyframes key-flash-wrong {
+  0%   { background: rgba(239,68,68,0.6); }
+  100% { background: rgba(255,255,255,0.12); }
+}
+.chest-key-correct { animation: key-flash-correct 0.4s ease; }
+.chest-key-wrong   { animation: key-flash-wrong 0.5s ease; }
+
+.chest-result-text {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-top: 8px;
+  color: #ffd700;
+  text-align: center;
+}
+
+.chest-end-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+@media (min-width: 600px) {
+  .chest-slot       { width: 64px; height: 72px; font-size: 2.2rem; }
+  .chest-icon       { font-size: 5.5rem; }
+  .chest-keyboard   { max-width: 480px; }
+  .chest-key        { font-size: 1.3rem; }
+}

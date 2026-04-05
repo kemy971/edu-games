@@ -13,6 +13,7 @@ import SubitizingScreen from './components/SubitizingScreen';
 import TracingScreen from './components/TracingScreen';
 import MoreOrLessScreen from './components/MoreOrLessScreen';
 import TenFrameScreen from './components/TenFrameScreen';
+import TreasureChestScreen from './components/TreasureChestScreen';
 
 interface AppState {
   screen: Screen;
@@ -83,6 +84,7 @@ export default function App() {
           onTracing={() => goTo('tracing')}
           onMoreOrLess={() => startActivity('more-or-less')}
           onTenFrame={() => startActivity('ten-frame')}
+          onTreasureChest={() => startActivity('treasure-chest')}
         />
       );
 
@@ -135,6 +137,16 @@ export default function App() {
           profile={profile}
           onComplete={score => showSummary(score, 'ten-frame')}
           onBack={() => goTo('menu')}
+        />
+      );
+
+    case 'treasure-chest':
+      return (
+        <TreasureChestScreen
+          key={state.activityKey}
+          profile={profile}
+          onBack={() => goTo('menu')}
+          onReplay={() => startActivity('treasure-chest')}
         />
       );
 

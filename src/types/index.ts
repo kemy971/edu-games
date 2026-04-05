@@ -28,7 +28,8 @@ export type Screen =
   | 'subitizing' | 'subitizing-summary'
   | 'tracing'
   | 'more-or-less'
-  | 'ten-frame';
+  | 'ten-frame'
+  | 'treasure-chest';
 export type QuizMode = 'letters' | 'numbers' | 'mixed';
 
 export type Question =
