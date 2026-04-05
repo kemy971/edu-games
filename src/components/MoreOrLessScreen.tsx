@@ -16,11 +16,28 @@ interface Round {
   rightEmoji: string;
   askMode: AskMode;
   correctSide: 'left' | 'right';
+  pairKey: string;
 }
 
-function buildRound(): Round {
-  // Pick two different numbers
-  const [a, b] = shuffleArray([...NUMBERS_DATA]).slice(0, 2);
+function buildRound(usedPairs: string[] = []): Round {
+  // Pick two different numbers, avoiding previously seen pairs
+  const allPairs: [typeof NUMBERS_DATA[0], typeof NUMBERS_DATA[0]][] = [];
+  for (let i = 0; i < NUMBERS_DATA.length; i++) {
+    for (let j = i + 1; j < NUMBERS_DATA.length; j++) {
+      const pairKey = `${NUMBERS_DATA[i].key}-${NUMBERS_DATA[j].key}`;
+      if (!usedPairs.includes(pairKey)) {
+        allPairs.push([NUMBERS_DATA[i], NUMBERS_DATA[j]]);
+      }
+    }
+  }
+  const pool = allPairs.length > 0 ? allPairs : ((): typeof allPairs => {
+    const p: typeof allPairs = [];
+    for (let i = 0; i < NUMBERS_DATA.length; i++)
+      for (let j = i + 1; j < NUMBERS_DATA.length; j++)
+        p.push([NUMBERS_DATA[i], NUMBERS_DATA[j]]);
+    return p;
+  })();
+  const [a, b] = shuffleArray(pool)[0];
   // Distinct emojis so the two sides don't look identical
   const askMode: AskMode = Math.random() < 0.5 ? 'plus' : 'moins';
   const correctSide =
@@ -28,6 +45,7 @@ function buildRound(): Round {
       ? (a.digit > b.digit ? 'left' : 'right')
       : (a.digit < b.digit ? 'left' : 'right');
 
+  const [ka, kb] = a.key < b.key ? [a.key, b.key] : [b.key, a.key];
   return {
     leftNum:    a.digit,
     rightNum:   b.digit,
@@ -35,6 +53,7 @@ function buildRound(): Round {
     rightEmoji: b.emoji,
     askMode,
     correctSide,
+    pairKey: `${ka}-${kb}`,
   };
 }
 
@@ -57,8 +76,9 @@ export default function MoreOrLessScreen({ profile, onComplete, onBack }: MoreOr
   const [showConfetti, setShowConfetti] = useState(false);
   const [score, setScore] = useState<QuizScore>({ correct: 0, total: 0 });
 
-  const scoreRef   = useRef<QuizScore>({ correct: 0, total: 0 });
+  const scoreRef    = useRef<QuizScore>({ correct: 0, total: 0 });
   const answeredRef = useRef(false);
+  const usedPairsRef = useRef<string[]>([]);
 
   const startRound = useCallback((r: Round) => {
     setRound(r);
@@ -70,8 +90,11 @@ export default function MoreOrLessScreen({ profile, onComplete, onBack }: MoreOr
 
   useEffect(() => {
     scoreRef.current = { correct: 0, total: 0 };
+    usedPairsRef.current = [];
     setScore({ correct: 0, total: 0 });
-    startRound(buildRound());
+    const r = buildRound([]);
+    usedPairsRef.current = [r.pairKey];
+    startRound(r);
     return () => cancel();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -95,7 +118,9 @@ export default function MoreOrLessScreen({ profile, onComplete, onBack }: MoreOr
         if (newScore.total >= QUIZ_CONFIG.questionsPerRound) {
           onComplete(newScore);
         } else {
-          startRound(buildRound());
+          const next = buildRound(usedPairsRef.current);
+          usedPairsRef.current = [...usedPairsRef.current, next.pairKey];
+          startRound(next);
         }
       }, 400);
     });

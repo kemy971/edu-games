@@ -44,8 +44,10 @@ export function pickRandom<T>(arr: T[], exclude: T[], count: number): T[] {
   return shuffleArray(pool).slice(0, count);
 }
 
-export function generateLetterQuestion(): Question {
-  const target = pickRandom(ALPHABET_DATA, [], 1)[0] as LetterData;
+export function generateLetterQuestion(excludeKeys: string[] = []): Question {
+  const pool = ALPHABET_DATA.filter(l => !excludeKeys.includes(l.key));
+  const source = pool.length > 0 ? pool : ALPHABET_DATA;
+  const target = shuffleArray([...source])[0] as LetterData;
   const distractors = pickRandom(ALPHABET_DATA, [target], QUIZ_CONFIG.choicesPerQuestion - 1) as LetterData[];
   const choices = shuffleArray([target, ...distractors]);
   return {
@@ -56,9 +58,11 @@ export function generateLetterQuestion(): Question {
   };
 }
 
-export function generateNumberQuestion(): Question {
+export function generateNumberQuestion(excludeKeys: string[] = []): Question {
   const useCountVariant = Math.random() < 0.5;
-  const target = pickRandom(NUMBERS_DATA, [], 1)[0] as NumberData;
+  const pool = NUMBERS_DATA.filter(n => !excludeKeys.includes(n.key));
+  const source = pool.length > 0 ? pool : NUMBERS_DATA;
+  const target = shuffleArray([...source])[0] as NumberData;
   const distractors = pickRandom(NUMBERS_DATA, [target], QUIZ_CONFIG.choicesPerQuestion - 1) as NumberData[];
   const choices = shuffleArray([target, ...distractors]);
 
