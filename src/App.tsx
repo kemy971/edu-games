@@ -83,6 +83,7 @@ export default function App() {
           onTracing={() => goTo('tracing')}
           onMoreOrLess={() => startActivity('more-or-less')}
           onTenFrame={() => startActivity('ten-frame')}
+          onQuiz={() => goTo('quiz-select')}
         />
       );
 

@@ -36,15 +36,22 @@ interface MenuScreenProps {
   onTracing: () => void;
   onMoreOrLess: () => void;
   onTenFrame: () => void;
+  onQuiz: () => void;
 }
 
 export default function MenuScreen({
   profile,
   onAlphabet, onNumbers,
   onMemory, onPhonics, onSubitizing, onTracing: _onTracing,
-  onMoreOrLess, onTenFrame,
+  onMoreOrLess, onTenFrame, onQuiz,
 }: MenuScreenProps) {
-  const [mascot, setMascot] = useState(profile.mascot ?? '🦊');
+  const [mascot, setMascot] = useState(() => {
+    try {
+      const raw = localStorage.getItem('edugame-profile');
+      if (raw) return (JSON.parse(raw) as { mascot?: string }).mascot ?? '🦊';
+    } catch { /* ignore */ }
+    return profile.mascot ?? '🦊';
+  });
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const handlePickMascot = (m: string) => {
@@ -129,6 +136,10 @@ export default function MenuScreen({
         <button className="activity-btn btn-yellow" onClick={onTenFrame}>
           <span className="act-icon">🔟</span>
           <span>Cadre de 10</span>
+        </button>
+        <button className="activity-btn btn-purple wide" onClick={onQuiz}>
+          <span className="act-icon">🏆</span>
+          <span>Quiz</span>
         </button>
       </div>
     </div>

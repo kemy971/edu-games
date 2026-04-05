@@ -10,11 +10,14 @@ interface Round {
   target: number;
   name: string;
   emoji: string;
+  key: string;
 }
 
-function buildRound(): Round {
-  const n = shuffleArray([...NUMBERS_DATA])[0];
-  return { target: n.digit, name: n.name, emoji: n.emoji };
+function buildRound(excludeKeys: string[] = []): Round {
+  const pool = NUMBERS_DATA.filter(n => !excludeKeys.includes(n.key));
+  const source = pool.length > 0 ? pool : NUMBERS_DATA;
+  const n = shuffleArray([...source])[0];
+  return { target: n.digit, name: n.name, emoji: n.emoji, key: n.key };
 }
 
 interface TenFrameScreenProps {
@@ -34,6 +37,7 @@ export default function TenFrameScreen({ profile, onComplete, onBack }: TenFrame
 
   const scoreRef = useRef<QuizScore>({ correct: 0, total: 0 });
   const answeredRef = useRef(false);
+  const usedKeysRef = useRef<string[]>([]);
 
   const startRound = useCallback((r: Round) => {
     setRound(r);
@@ -47,8 +51,11 @@ export default function TenFrameScreen({ profile, onComplete, onBack }: TenFrame
 
   useEffect(() => {
     scoreRef.current = { correct: 0, total: 0 };
+    usedKeysRef.current = [];
     setScore({ correct: 0, total: 0 });
-    startRound(buildRound());
+    const r = buildRound([]);
+    usedKeysRef.current = [r.key];
+    startRound(r);
     return () => cancel();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -73,7 +80,9 @@ export default function TenFrameScreen({ profile, onComplete, onBack }: TenFrame
         if (newScore.total >= QUIZ_CONFIG.questionsPerRound) {
           onComplete(newScore);
         } else {
-          startRound(buildRound());
+          const next = buildRound(usedKeysRef.current);
+          usedKeysRef.current = [...usedKeysRef.current, next.key];
+          startRound(next);
         }
       }, 400);
     });

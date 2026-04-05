@@ -11,8 +11,10 @@ interface PhonicsQuestion {
   choices: LetterData[];
 }
 
-function buildQuestion(): PhonicsQuestion {
-  const target = shuffleArray([...ALPHABET_DATA])[0];
+function buildQuestion(excludeKeys: string[] = []): PhonicsQuestion {
+  const pool = ALPHABET_DATA.filter(l => !excludeKeys.includes(l.key));
+  const source = pool.length > 0 ? pool : ALPHABET_DATA;
+  const target = shuffleArray([...source])[0];
   const others = shuffleArray(ALPHABET_DATA.filter(l => l.key !== target.key)).slice(0, 3);
   return { target, choices: shuffleArray([target, ...others]) };
 }
@@ -33,6 +35,7 @@ export default function PhonicsScreen({ profile, onComplete, onBack }: PhonicsSc
 
   const scoreRef = useRef<QuizScore>({ correct: 0, total: 0 });
   const answeredRef = useRef(false);
+  const usedKeysRef = useRef<string[]>([]);
 
   const askQuestion = useCallback((q: PhonicsQuestion) => {
     setQuestion(q);
@@ -45,8 +48,11 @@ export default function PhonicsScreen({ profile, onComplete, onBack }: PhonicsSc
 
   useEffect(() => {
     scoreRef.current = { correct: 0, total: 0 };
+    usedKeysRef.current = [];
     setScore({ correct: 0, total: 0 });
-    askQuestion(buildQuestion());
+    const q = buildQuestion([]);
+    usedKeysRef.current = [q.target.key];
+    askQuestion(q);
     return () => cancel();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -71,7 +77,9 @@ export default function PhonicsScreen({ profile, onComplete, onBack }: PhonicsSc
         if (newScore.total >= QUIZ_CONFIG.questionsPerRound) {
           onComplete(newScore);
         } else {
-          askQuestion(buildQuestion());
+          const next = buildQuestion(usedKeysRef.current);
+          usedKeysRef.current = [...usedKeysRef.current, next.target.key];
+          askQuestion(next);
         }
       }, 400);
     });

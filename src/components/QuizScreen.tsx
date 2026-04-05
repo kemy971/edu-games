@@ -30,6 +30,7 @@ export default function QuizScreen({ mode, profile, onComplete, onBack }: QuizSc
   // Refs to access latest values inside callbacks
   const scoreRef = useRef<QuizScore>({ correct: 0, total: 0 });
   const answeredRef = useRef(false);
+  const usedKeysRef = useRef<string[]>([]);
   const modeRef = useRef(mode);
   modeRef.current = mode;
 
@@ -37,11 +38,14 @@ export default function QuizScreen({ mode, profile, onComplete, onBack }: QuizSc
     const effectiveMode = modeRef.current === 'mixed'
       ? (Math.random() < 0.5 ? 'letters' : 'numbers')
       : modeRef.current;
-    return effectiveMode === 'letters' ? generateLetterQuestion() : generateNumberQuestion();
+    return effectiveMode === 'letters'
+      ? generateLetterQuestion(usedKeysRef.current)
+      : generateNumberQuestion(usedKeysRef.current);
   }, []);
 
   const loadNextQuestion = useCallback(() => {
     const q = buildQuestion();
+    usedKeysRef.current = [...usedKeysRef.current, q.target.key];
     setQuestion(q);
     setAnswered(false);
     answeredRef.current = false;
@@ -53,6 +57,7 @@ export default function QuizScreen({ mode, profile, onComplete, onBack }: QuizSc
   // Mount: start quiz
   useEffect(() => {
     scoreRef.current = { correct: 0, total: 0 };
+    usedKeysRef.current = [];
     setScore({ correct: 0, total: 0 });
     loadNextQuestion();
     return () => cancel();
