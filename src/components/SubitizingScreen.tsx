@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { NUMBERS_DATA } from '../data/numbers';
+import { NUMBERS_DATA, FRUIT_POOL } from '../data/numbers';
 import { shuffleArray, QUIZ_CONFIG, buildSuccessPhrases, buildFailurePhrases, pickPhrase } from '../data/quiz';
 import { useSpeech } from '../hooks/useSpeech';
 import type { NumberData, QuizScore, ChildProfile } from '../types';
@@ -11,6 +11,7 @@ const SUBITIZE_DATA = NUMBERS_DATA.slice(0, 6);
 
 interface SubitizingQuestion {
   target: NumberData;
+  emoji: string;
   choices: NumberData[];
 }
 
@@ -19,7 +20,8 @@ function buildQuestion(excludeKeys: string[]): SubitizingQuestion {
   const source = pool.length > 0 ? pool : SUBITIZE_DATA;
   const target = shuffleArray([...source])[0];
   const others = shuffleArray(SUBITIZE_DATA.filter(n => n.key !== target.key)).slice(0, 3);
-  return { target, choices: shuffleArray([target, ...others]) };
+  const emoji = FRUIT_POOL[Math.floor(Math.random() * FRUIT_POOL.length)];
+  return { target, emoji, choices: shuffleArray([target, ...others]) };
 }
 
 interface SubitizingScreenProps {
@@ -86,7 +88,7 @@ export default function SubitizingScreen({ profile, onComplete, onBack }: Subiti
   }, [question, speak, onComplete, startRound, profile]);
 
   const correctKey = question.target.key;
-  const dots = Array(question.target.digit).fill(question.target.emoji);
+  const dots = Array(question.target.digit).fill(question.emoji);
 
   return (
     <div className="page page-quiz">

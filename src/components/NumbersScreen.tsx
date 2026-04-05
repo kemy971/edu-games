@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { NUMBERS_DATA } from '../data/numbers';
+import { useState, useMemo } from 'react';
+import { NUMBERS_DATA, FRUIT_POOL } from '../data/numbers';
 import { useSpeech } from '../hooks/useSpeech';
 import BackButton from './BackButton';
 import type { NumberData } from '../types';
@@ -11,6 +11,10 @@ interface NumbersScreenProps {
 export default function NumbersScreen({ onBack }: NumbersScreenProps) {
   const { speak, cancel } = useSpeech();
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const emojis = useMemo(
+    () => NUMBERS_DATA.map(() => FRUIT_POOL[Math.floor(Math.random() * FRUIT_POOL.length)]),
+    []
+  );
 
   const handleClick = (num: NumberData) => {
     cancel();
@@ -27,7 +31,7 @@ export default function NumbersScreen({ onBack }: NumbersScreenProps) {
         <div className="header-spacer" />
       </header>
       <div className="numbers-grid">
-        {NUMBERS_DATA.map(num => (
+        {NUMBERS_DATA.map((num, i) => (
           <div
             key={num.key}
             className={`card ${activeKey === num.key ? 'bounce speaking' : ''}`}
@@ -36,7 +40,7 @@ export default function NumbersScreen({ onBack }: NumbersScreenProps) {
             <span className="card-digit">{num.digit}</span>
             <span className="card-name">{num.name}</span>
             <div className="card-emoji-row">
-              {Array(num.digit).fill(num.emoji).join('')}
+              {Array(num.digit).fill(emojis[i]).join('')}
             </div>
           </div>
         ))}

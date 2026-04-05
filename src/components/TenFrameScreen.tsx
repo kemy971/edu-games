@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { NUMBERS_DATA } from '../data/numbers';
+import { NUMBERS_DATA, FRUIT_POOL } from '../data/numbers';
 import { shuffleArray, QUIZ_CONFIG, buildSuccessPhrases, buildFailurePhrases, pickPhrase } from '../data/quiz';
 import { useSpeech } from '../hooks/useSpeech';
 import type { QuizScore, ChildProfile } from '../types';
@@ -17,7 +17,7 @@ function buildRound(excludeKeys: string[] = []): Round {
   const pool = NUMBERS_DATA.filter(n => !excludeKeys.includes(n.key));
   const source = pool.length > 0 ? pool : NUMBERS_DATA;
   const n = shuffleArray([...source])[0];
-  return { target: n.digit, name: n.name, emoji: n.emoji, key: n.key };
+  return { target: n.digit, name: n.name, emoji: FRUIT_POOL[Math.floor(Math.random() * FRUIT_POOL.length)], key: n.key };
 }
 
 interface TenFrameScreenProps {

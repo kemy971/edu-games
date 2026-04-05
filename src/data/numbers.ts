@@ -1,5 +1,7 @@
 import type { NumberData } from '../types';
 
+export const FRUIT_POOL = ['🍎','🍊','🍋','🍇','🍓','🥝','🍒','🫐','🍑','🥭','🍌','🍉','🍐','🥥','🍈'];
+
 export const NUMBERS_DATA: NumberData[] = [
   { key: '1',  digit: 1,  name: 'Un',     emoji: '🍎' },
   { key: '2',  digit: 2,  name: 'Deux',   emoji: '🍊' },

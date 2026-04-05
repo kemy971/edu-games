@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ALPHABET_DATA } from '../data/alphabet';
+import { useState, useMemo } from 'react';
+import { ALPHABET_DATA, pickLetterVariant } from '../data/alphabet';
 import { useSpeech } from '../hooks/useSpeech';
 import BackButton from './BackButton';
 import type { LetterData } from '../types';
@@ -11,6 +11,10 @@ interface AlphabetScreenProps {
 export default function AlphabetScreen({ onBack }: AlphabetScreenProps) {
   const { speak, cancel } = useSpeech();
   const [activeKey, setActiveKey] = useState<string | null>(null);
+  const resolvedLetters = useMemo(
+    () => ALPHABET_DATA.map(l => ({ ...l, ...pickLetterVariant(l) })),
+    []
+  );
 
   const handleClick = (letter: LetterData) => {
     cancel();
@@ -26,7 +30,7 @@ export default function AlphabetScreen({ onBack }: AlphabetScreenProps) {
         <div className="header-spacer" />
       </header>
       <div className="alphabet-grid">
-        {ALPHABET_DATA.map(letter => (
+        {resolvedLetters.map(letter => (
           <div
             key={letter.key}
             className={`card ${activeKey === letter.key ? 'bounce speaking' : ''}`}

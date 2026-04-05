@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ALPHABET_DATA } from '../data/alphabet';
+import { ALPHABET_DATA, pickLetterVariant } from '../data/alphabet';
 import { shuffleArray, pickPhrase, buildSuccessPhrases, buildFailurePhrases, QUIZ_CONFIG } from '../data/quiz';
 import { useSpeech } from '../hooks/useSpeech';
 import type { LetterData, QuizScore, ChildProfile } from '../types';
@@ -14,8 +14,10 @@ interface PhonicsQuestion {
 function buildQuestion(excludeKeys: string[] = []): PhonicsQuestion {
   const pool = ALPHABET_DATA.filter(l => !excludeKeys.includes(l.key));
   const source = pool.length > 0 ? pool : ALPHABET_DATA;
-  const target = shuffleArray([...source])[0];
-  const others = shuffleArray(ALPHABET_DATA.filter(l => l.key !== target.key)).slice(0, 3);
+  const picked = shuffleArray([...source])[0];
+  const variant = pickLetterVariant(picked);
+  const target: LetterData = { ...picked, ...variant };
+  const others = shuffleArray(ALPHABET_DATA.filter(l => l.key !== picked.key)).slice(0, 3);
   return { target, choices: shuffleArray([target, ...others]) };
 }
 

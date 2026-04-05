@@ -3,6 +3,7 @@ export interface LetterData {
   emoji: string;
   word: string;
   article: string;
+  variants?: Array<{ emoji: string; word: string; article: string }>;
 }
 
 export interface NumberData {
