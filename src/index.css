@@ -1213,10 +1213,10 @@ button {
 .chest-heart { transition: transform 0.3s, opacity 0.3s; }
 .chest-heart-lost { opacity: 0.4; transform: scale(0.8); }
 
-.chest-icon {
-  font-size: 4.5rem;
-  line-height: 1;
-  transition: transform 0.4s;
+.chest-lottie {
+  width: 160px;
+  height: 160px;
+  transition: transform 0.4s, filter 0.4s;
 }
 
 @keyframes chest-shake {
@@ -1317,7 +1317,7 @@ button {
 
 @media (min-width: 600px) {
   .chest-slot       { width: 64px; height: 72px; font-size: 2.2rem; }
-  .chest-icon       { font-size: 5.5rem; }
+  .chest-lottie     { width: 200px; height: 200px; }
   .chest-keyboard   { max-width: 480px; }
   .chest-key        { font-size: 1.3rem; }
 }

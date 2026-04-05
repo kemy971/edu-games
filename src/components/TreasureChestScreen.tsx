@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Lottie from 'lottie-react';
 import { ALPHABET_DATA } from '../data/alphabet';
 import { NUMBERS_DATA } from '../data/numbers';
 import { shuffleArray } from '../data/quiz';
@@ -6,6 +7,8 @@ import { useSpeech } from '../hooks/useSpeech';
 import type { ChildProfile } from '../types';
 import BackButton from './BackButton';
 import Confetti from './Confetti';
+import chestAnimation from '../assets/lottie/treasure chest.json';
+import explosionAnimation from '../assets/lottie/explosion.json';
 
 const MAX_MISTAKES = 3;
 const COMBO_LENGTH = 4;
@@ -145,10 +148,13 @@ export default function TreasureChestScreen({ profile, onBack, onReplay }: Treas
           ))}
         </div>
 
-        <div className={`chest-icon ${shakeWrong ? 'chest-shake' : ''}`}>
-          {chestState === 'locked' && '🔒'}
-          {chestState === 'opened' && '💎'}
-          {chestState === 'destroyed' && '💥'}
+        <div className={`chest-lottie ${shakeWrong ? 'chest-shake' : ''}`}>
+          <Lottie
+            key={chestState}
+            animationData={chestState === 'destroyed' ? explosionAnimation : chestAnimation}
+            loop={false}
+            autoplay={chestState !== 'locked'}
+          />
         </div>
 
         <div className="chest-combo">
