@@ -13,6 +13,7 @@ interface MemCard {
   pairId: string;
   mainDisplay: string;
   subDisplay?: string;
+  speechText: string;
   isFlipped: boolean;
   isMatched: boolean;
 }
@@ -21,8 +22,9 @@ function buildLetterCards(): MemCard[] {
   const selected = shuffleArray([...ALPHABET_DATA]).slice(0, 6);
   const cards: MemCard[] = [];
   selected.forEach(letter => {
-    cards.push({ id: `${letter.key}-L`, pairId: letter.key, mainDisplay: letter.key, isFlipped: false, isMatched: false });
-    cards.push({ id: `${letter.key}-I`, pairId: letter.key, mainDisplay: letter.emoji, subDisplay: letter.word, isFlipped: false, isMatched: false });
+    const speech = `${letter.key} comme ${letter.word}`;
+    cards.push({ id: `${letter.key}-L`, pairId: letter.key, mainDisplay: letter.key, speechText: speech, isFlipped: false, isMatched: false });
+    cards.push({ id: `${letter.key}-I`, pairId: letter.key, mainDisplay: letter.emoji, subDisplay: letter.word, speechText: speech, isFlipped: false, isMatched: false });
   });
   return shuffleArray(cards);
 }
@@ -31,8 +33,9 @@ function buildNumberCards(): MemCard[] {
   const selected = shuffleArray([...NUMBERS_DATA]).slice(0, 6);
   const cards: MemCard[] = [];
   selected.forEach(num => {
-    cards.push({ id: `${num.key}-D`, pairId: num.key, mainDisplay: String(num.digit), subDisplay: num.name, isFlipped: false, isMatched: false });
-    cards.push({ id: `${num.key}-E`, pairId: num.key, mainDisplay: Array(num.digit).fill(num.emoji).join(''), isFlipped: false, isMatched: false });
+    const speech = num.name;
+    cards.push({ id: `${num.key}-D`, pairId: num.key, mainDisplay: String(num.digit), subDisplay: num.name, speechText: speech, isFlipped: false, isMatched: false });
+    cards.push({ id: `${num.key}-E`, pairId: num.key, mainDisplay: Array(num.digit).fill(num.emoji).join(''), speechText: speech, isFlipped: false, isMatched: false });
   });
   return shuffleArray(cards);
 }
@@ -67,6 +70,7 @@ export default function MemoryScreen({ onBack }: MemoryScreenProps) {
     const newFlipped = [...flippedIds, card.id];
     setCards(prev => prev.map(c => c.id === card.id ? { ...c, isFlipped: true } : c));
     setFlippedIds(newFlipped);
+    speak(card.speechText);
 
     if (newFlipped.length === 2) {
       setIsChecking(true);
