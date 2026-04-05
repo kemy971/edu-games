@@ -52,6 +52,27 @@ src/
     └── ...                   # Un fichier par activité
 ```
 
+## Déploiement (Firebase Hosting)
+
+### Prérequis
+
+1. Créer un projet sur [Firebase Console](https://console.firebase.google.com/)
+2. Remplacer `YOUR_FIREBASE_PROJECT_ID` par l'ID de ton projet dans `.firebaserc`
+
+### Se connecter
+
+```bash
+npx firebase login
+```
+
+### Déployer
+
+```bash
+npm run deploy     # build + déploiement en une commande
+```
+
+L'app sera disponible à `https://YOUR_FIREBASE_PROJECT_ID.web.app`.
+
 ## Profil enfant
 
 Au premier lancement, l'app demande le prénom et le sexe de l'enfant. Ces informations sont sauvegardées dans le `localStorage` (`edugame-profile`) et ne sont plus redemandées. La mascotte choisie dans le menu est également persistée dans ce même objet.
