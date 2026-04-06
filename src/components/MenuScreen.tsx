@@ -37,13 +37,14 @@ interface MenuScreenProps {
   onMoreOrLess: () => void;
   onTenFrame: () => void;
   onTreasureChest: () => void;
+  onMatching: () => void;
 }
 
 export default function MenuScreen({
   profile,
   onAlphabet, onNumbers,
   onMemory, onPhonics, onSubitizing, onTracing: _onTracing,
-  onMoreOrLess, onTenFrame, onTreasureChest,
+  onMoreOrLess, onTenFrame, onTreasureChest, onMatching,
 }: MenuScreenProps) {
   const [mascot, setMascot] = useState(() => {
     try {
@@ -140,6 +141,10 @@ export default function MenuScreen({
         <button className="activity-btn btn-purple" onClick={onTreasureChest}>
           <span className="act-icon">🔒</span>
           <span>Coffre au Trésor</span>
+        </button>
+        <button className="activity-btn btn-sky" onClick={onMatching}>
+          <span className="act-icon">🔗</span>
+          <span>Relier</span>
         </button>
       </div>
     </div>

@@ -14,6 +14,7 @@ import TracingScreen from './components/TracingScreen';
 import MoreOrLessScreen from './components/MoreOrLessScreen';
 import TenFrameScreen from './components/TenFrameScreen';
 import TreasureChestScreen from './components/TreasureChestScreen';
+import MatchingScreen from './components/MatchingScreen';
 
 interface AppState {
   screen: Screen;
@@ -85,6 +86,7 @@ export default function App() {
           onMoreOrLess={() => startActivity('more-or-less')}
           onTenFrame={() => startActivity('ten-frame')}
           onTreasureChest={() => startActivity('treasure-chest')}
+          onMatching={() => startActivity('matching')}
         />
       );
 
@@ -161,6 +163,16 @@ export default function App() {
           profile={profile}
           onComplete={score => showSummary(score, 'quiz')}
           onBack={() => goTo('quiz-select')}
+        />
+      );
+
+    case 'matching':
+      return (
+        <MatchingScreen
+          key={state.activityKey}
+          profile={profile}
+          onComplete={score => showSummary(score, 'matching')}
+          onBack={() => goTo('menu')}
         />
       );
 
