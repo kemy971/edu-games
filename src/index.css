@@ -1445,7 +1445,8 @@ button {
   transform: scale(0.94);
 }
 
-.matching-left-btn.selected {
+.matching-left-btn.selected,
+.matching-right-btn.selected {
   border-color: var(--blue);
   background: #EEF5FF;
   box-shadow: 0 0 0 4px rgba(77, 166, 255, 0.3), var(--shadow);

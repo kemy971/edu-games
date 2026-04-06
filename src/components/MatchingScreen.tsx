@@ -53,9 +53,11 @@ export default function MatchingScreen({ profile, onComplete, onBack }: Props) {
   const [items, setItems] = useState<MatchItem[]>([]);
   const [rightOrder, setRightOrder] = useState<number[]>([]);
   const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
+  const [selectedRight, setSelectedRight] = useState<number | null>(null);
   const [matchedLeft, setMatchedLeft] = useState<Set<number>>(new Set());
   const [matchedRight, setMatchedRight] = useState<Set<number>>(new Set());
   const [lines, setLines] = useState<LineData[]>([]);
+  const [wrongLeft, setWrongLeft] = useState<number | null>(null);
   const [wrongRight, setWrongRight] = useState<number | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
   const [score, setScore] = useState<QuizScore>({ correct: 0, total: 0 });
@@ -75,9 +77,11 @@ export default function MatchingScreen({ profile, onComplete, onBack }: Props) {
     setItems(newItems);
     setRightOrder(newOrder);
     setSelectedLeft(null);
+    setSelectedRight(null);
     setMatchedLeft(new Set());
     setMatchedRight(new Set());
     setLines([]);
+    setWrongLeft(null);
     setWrongRight(null);
     setShowConfetti(false);
     hadMistakeRef.current = false;
@@ -102,65 +106,83 @@ export default function MatchingScreen({ profile, onComplete, onBack }: Props) {
     };
   }
 
-  const handleLeftClick = (idx: number) => {
-    if (matchedLeft.has(idx) || advancingRef.current) return;
-    setSelectedLeft(prev => (prev === idx ? null : idx));
-  };
-
-  const handleRightClick = (displayIdx: number) => {
-    if (selectedLeft === null || matchedRight.has(displayIdx) || advancingRef.current) return;
-
-    const leftEl = leftRefs.current[selectedLeft];
-    const rightEl = rightRefs.current[displayIdx];
+  const tryMatch = useCallback((leftIdx: number, rightDisplayIdx: number) => {
+    const leftEl = leftRefs.current[leftIdx];
+    const rightEl = rightRefs.current[rightDisplayIdx];
     if (!leftEl || !rightEl || !containerRef.current) return;
 
     const lc = getCenter(leftEl);
     const rc = getCenter(rightEl);
-    const correct = rightOrder[displayIdx] === selectedLeft;
-    const lineId = `${selectedLeft}-${displayIdx}-${Date.now()}`;
+    const correct = rightOrder[rightDisplayIdx] === leftIdx;
+    const lineId = `${leftIdx}-${rightDisplayIdx}-${Date.now()}`;
+
+    setSelectedLeft(null);
+    setSelectedRight(null);
 
     if (correct) {
-      const newMatchedLeft = new Set([...matchedLeft, selectedLeft]);
-      const newMatchedRight = new Set([...matchedRight, displayIdx]);
       setLines(prev => [...prev, { id: lineId, x1: lc.x, y1: lc.y, x2: rc.x, y2: rc.y, correct: true }]);
-      setMatchedLeft(newMatchedLeft);
-      setMatchedRight(newMatchedRight);
-      setSelectedLeft(null);
-
-      if (newMatchedLeft.size === items.length) {
-        advancingRef.current = true;
-        const wasCorrect = !hadMistakeRef.current;
-        const newScore: QuizScore = {
-          correct: scoreRef.current.correct + (wasCorrect ? 1 : 0),
-          total: scoreRef.current.total + 1,
-        };
-        scoreRef.current = newScore;
-        setScore(newScore);
-        if (wasCorrect) setShowConfetti(true);
-
-        const phrases = wasCorrect
-          ? buildSuccessPhrases(profile.name, profile.gender)
-          : buildFailurePhrases(profile.name);
-        speak(pickPhrase(phrases), () => {
-          setTimeout(() => {
-            if (newScore.total >= TOTAL_ROUNDS) {
-              onComplete(newScore);
-            } else {
-              startRound(mode!);
-            }
-          }, 400);
+      setMatchedLeft(prev => {
+        const next = new Set([...prev, leftIdx]);
+        setMatchedRight(prevR => {
+          const nextR = new Set([...prevR, rightDisplayIdx]);
+          if (next.size === 3) {
+            advancingRef.current = true;
+            const wasCorrect = !hadMistakeRef.current;
+            const newScore: QuizScore = {
+              correct: scoreRef.current.correct + (wasCorrect ? 1 : 0),
+              total: scoreRef.current.total + 1,
+            };
+            scoreRef.current = newScore;
+            setScore(newScore);
+            if (wasCorrect) setShowConfetti(true);
+            const phrases = wasCorrect
+              ? buildSuccessPhrases(profile.name, profile.gender)
+              : buildFailurePhrases(profile.name);
+            speak(pickPhrase(phrases), () => {
+              setTimeout(() => {
+                if (newScore.total >= TOTAL_ROUNDS) {
+                  onComplete(newScore);
+                } else {
+                  startRound(mode!);
+                }
+              }, 400);
+            });
+          }
+          return nextR;
         });
-      }
+        return next;
+      });
     } else {
       hadMistakeRef.current = true;
       setLines(prev => [...prev, { id: lineId, x1: lc.x, y1: lc.y, x2: rc.x, y2: rc.y, correct: false }]);
-      setWrongRight(displayIdx);
+      setWrongLeft(leftIdx);
+      setWrongRight(rightDisplayIdx);
       setTimeout(() => {
         setLines(prev => prev.filter(l => l.id !== lineId));
+        setWrongLeft(null);
         setWrongRight(null);
-        setSelectedLeft(null);
       }, 700);
     }
+  }, [rightOrder, items.length, profile, speak, onComplete, startRound, mode]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleLeftClick = (idx: number) => {
+    if (matchedLeft.has(idx) || advancingRef.current) return;
+    if (selectedRight !== null) {
+      tryMatch(idx, selectedRight);
+      return;
+    }
+    setSelectedLeft(prev => (prev === idx ? null : idx));
+    setSelectedRight(null);
+  };
+
+  const handleRightClick = (displayIdx: number) => {
+    if (matchedRight.has(displayIdx) || advancingRef.current) return;
+    if (selectedLeft !== null) {
+      tryMatch(selectedLeft, displayIdx);
+      return;
+    }
+    setSelectedRight(prev => (prev === displayIdx ? null : displayIdx));
+    setSelectedLeft(null);
   };
 
   if (!mode) {
@@ -226,6 +248,7 @@ export default function MatchingScreen({ profile, onComplete, onBack }: Props) {
                   'matching-left-btn',
                   selectedLeft === idx ? 'selected' : '',
                   matchedLeft.has(idx) ? 'matched' : '',
+                  wrongLeft === idx ? 'wrong' : '',
                 ].filter(Boolean).join(' ')}
                 onClick={() => handleLeftClick(idx)}
               >
@@ -244,6 +267,7 @@ export default function MatchingScreen({ profile, onComplete, onBack }: Props) {
                   className={[
                     'matching-item-btn',
                     'matching-right-btn',
+                    selectedRight === displayIdx ? 'selected' : '',
                     matchedRight.has(displayIdx) ? 'matched' : '',
                     wrongRight === displayIdx ? 'wrong' : '',
                   ].filter(Boolean).join(' ')}
