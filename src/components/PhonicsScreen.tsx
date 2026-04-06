@@ -6,19 +6,44 @@ import type { LetterData, QuizScore, ChildProfile } from '../types';
 import BackButton from './BackButton';
 import Confetti from './Confetti';
 
+// Pick a variant for the letter, excluding a specific word (to avoid trivial visual match)
+function pickVariantExcluding(letter: LetterData, excludeWord: string): { emoji: string; word: string } {
+  const all = [
+    { emoji: letter.emoji, word: letter.word },
+    ...(letter.variants ?? []),
+  ];
+  const others = all.filter(v => v.word !== excludeWord);
+  const pool = others.length > 0 ? others : all;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+interface PhonicsChoice extends LetterData {
+  displayEmoji: string;
+  displayWord: string;
+}
+
 interface PhonicsQuestion {
   target: LetterData;
-  choices: LetterData[];
+  choices: PhonicsChoice[];
 }
 
 function buildQuestion(excludeKeys: string[] = []): PhonicsQuestion {
   const pool = ALPHABET_DATA.filter(l => !excludeKeys.includes(l.key));
   const source = pool.length > 0 ? pool : ALPHABET_DATA;
   const picked = shuffleArray([...source])[0];
-  const variant = pickLetterVariant(picked);
-  const target: LetterData = { ...picked, ...variant };
+  const questionVariant = pickLetterVariant(picked);
+  const target: LetterData = { ...picked, ...questionVariant };
   const others = shuffleArray(ALPHABET_DATA.filter(l => l.key !== picked.key)).slice(0, 3);
-  return { target, choices: shuffleArray([target, ...others]) };
+
+  const choices: PhonicsChoice[] = shuffleArray([picked, ...others]).map(letter => {
+    // For the correct letter, show a DIFFERENT word/emoji than the question visual
+    const buttonVariant = letter.key === picked.key
+      ? pickVariantExcluding(letter, questionVariant.word)
+      : pickLetterVariant(letter);
+    return { ...letter, displayEmoji: buttonVariant.emoji, displayWord: buttonVariant.word };
+  });
+
+  return { target, choices };
 }
 
 interface PhonicsScreenProps {
@@ -124,6 +149,7 @@ export default function PhonicsScreen({ profile, onComplete, onBack }: PhonicsSc
               onClick={() => handleAnswer(choice.key)}
             >
               <span>{choice.key}</span>
+              <span className="choice-sub">{choice.displayEmoji} {choice.displayWord}</span>
             </button>
           );
         })}
