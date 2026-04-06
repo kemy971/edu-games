@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { ALPHABET_DATA, pickLetterVariant } from '../data/alphabet';
+import { ALPHABET_DATA } from '../data/alphabet';
 import { NUMBERS_DATA } from '../data/numbers';
 import { shuffleArray } from '../data/quiz';
 import { useSpeech } from '../hooks/useSpeech';
@@ -22,10 +22,9 @@ function buildLetterCards(): MemCard[] {
   const selected = shuffleArray([...ALPHABET_DATA]).slice(0, 6);
   const cards: MemCard[] = [];
   selected.forEach(letter => {
-    const variant = pickLetterVariant(letter);
-    const speech = `${letter.key} comme ${variant.word}`;
+    const speech = `${letter.key} comme ${letter.word}`;
     cards.push({ id: `${letter.key}-L`, pairId: letter.key, mainDisplay: letter.key, speechText: speech, isFlipped: false, isMatched: false });
-    cards.push({ id: `${letter.key}-I`, pairId: letter.key, mainDisplay: variant.emoji, subDisplay: variant.word, speechText: speech, isFlipped: false, isMatched: false });
+    cards.push({ id: `${letter.key}-I`, pairId: letter.key, mainDisplay: letter.emoji, subDisplay: letter.word, speechText: speech, isFlipped: false, isMatched: false });
   });
   return shuffleArray(cards);
 }
