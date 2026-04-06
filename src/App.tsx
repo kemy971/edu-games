@@ -86,7 +86,7 @@ export default function App() {
           onMoreOrLess={() => startActivity('more-or-less')}
           onTenFrame={() => startActivity('ten-frame')}
           onTreasureChest={() => startActivity('treasure-chest')}
-          onMatching={() => goTo('matching')}
+          onMatching={() => startActivity('matching')}
         />
       );
 
@@ -167,7 +167,14 @@ export default function App() {
       );
 
     case 'matching':
-      return <MatchingScreen onBack={() => goTo('menu')} />;
+      return (
+        <MatchingScreen
+          key={state.activityKey}
+          profile={profile}
+          onComplete={score => showSummary(score, 'matching')}
+          onBack={() => goTo('menu')}
+        />
+      );
 
     case 'summary':
       return (

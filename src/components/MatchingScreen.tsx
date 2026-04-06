@@ -1,9 +1,13 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { ALPHABET_DATA } from '../data/alphabet';
 import { NUMBERS_DATA } from '../data/numbers';
-import { shuffleArray } from '../data/quiz';
-import BackButton from './BackButton';
+import { shuffleArray, buildSuccessPhrases, buildFailurePhrases, pickPhrase } from '../data/quiz';
 import { useSpeech } from '../hooks/useSpeech';
+import BackButton from './BackButton';
+import Confetti from './Confetti';
+import type { ChildProfile, QuizScore } from '../types';
+
+const TOTAL_ROUNDS = 5;
 
 type MatchMode = 'letters' | 'numbers';
 
@@ -22,30 +26,29 @@ interface LineData {
 }
 
 function buildItems(mode: MatchMode): { items: MatchItem[]; rightOrder: number[] } {
-  let items: MatchItem[];
-  if (mode === 'letters') {
-    items = shuffleArray([...ALPHABET_DATA]).slice(0, 3).map(l => ({
-      id: l.key,
-      leftLabel: l.key,
-      rightLabel: l.word,
-      rightEmoji: l.emoji,
-    }));
-  } else {
-    items = shuffleArray([...NUMBERS_DATA]).slice(0, 3).map(n => ({
-      id: n.key,
-      leftLabel: String(n.digit),
-      rightLabel: n.name,
-      rightEmoji: n.emoji,
-    }));
-  }
+  const items: MatchItem[] = mode === 'letters'
+    ? shuffleArray([...ALPHABET_DATA]).slice(0, 3).map(l => ({
+        id: l.key,
+        leftLabel: l.key,
+        rightLabel: l.word,
+        rightEmoji: l.emoji,
+      }))
+    : shuffleArray([...NUMBERS_DATA]).slice(0, 3).map(n => ({
+        id: n.key,
+        leftLabel: String(n.digit),
+        rightLabel: n.name,
+        rightEmoji: n.emoji,
+      }));
   return { items, rightOrder: shuffleArray([0, 1, 2]) };
 }
 
 interface Props {
+  profile: ChildProfile;
+  onComplete: (score: QuizScore) => void;
   onBack: () => void;
 }
 
-export default function MatchingScreen({ onBack }: Props) {
+export default function MatchingScreen({ profile, onComplete, onBack }: Props) {
   const [mode, setMode] = useState<MatchMode | null>(null);
   const [items, setItems] = useState<MatchItem[]>([]);
   const [rightOrder, setRightOrder] = useState<number[]>([]);
@@ -54,16 +57,20 @@ export default function MatchingScreen({ onBack }: Props) {
   const [matchedRight, setMatchedRight] = useState<Set<number>>(new Set());
   const [lines, setLines] = useState<LineData[]>([]);
   const [wrongRight, setWrongRight] = useState<number | null>(null);
-  const [done, setDone] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [score, setScore] = useState<QuizScore>({ correct: 0, total: 0 });
 
   const containerRef = useRef<HTMLDivElement>(null);
   const leftRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const rightRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const scoreRef = useRef<QuizScore>({ correct: 0, total: 0 });
+  const hadMistakeRef = useRef(false);
+  const advancingRef = useRef(false);
 
   const { speak, cancel } = useSpeech();
   useEffect(() => () => cancel(), [cancel]);
 
-  const initRound = useCallback((m: MatchMode) => {
+  const startRound = useCallback((m: MatchMode) => {
     const { items: newItems, rightOrder: newOrder } = buildItems(m);
     setItems(newItems);
     setRightOrder(newOrder);
@@ -72,14 +79,18 @@ export default function MatchingScreen({ onBack }: Props) {
     setMatchedRight(new Set());
     setLines([]);
     setWrongRight(null);
-    setDone(false);
+    setShowConfetti(false);
+    hadMistakeRef.current = false;
+    advancingRef.current = false;
     leftRefs.current = [null, null, null];
     rightRefs.current = [null, null, null];
   }, []);
 
   const handleModeSelect = (m: MatchMode) => {
+    scoreRef.current = { correct: 0, total: 0 };
+    setScore({ correct: 0, total: 0 });
     setMode(m);
-    initRound(m);
+    startRound(m);
   };
 
   function getCenter(el: HTMLElement): { x: number; y: number } {
@@ -92,13 +103,12 @@ export default function MatchingScreen({ onBack }: Props) {
   }
 
   const handleLeftClick = (idx: number) => {
-    if (matchedLeft.has(idx)) return;
+    if (matchedLeft.has(idx) || advancingRef.current) return;
     setSelectedLeft(prev => (prev === idx ? null : idx));
   };
 
   const handleRightClick = (displayIdx: number) => {
-    if (selectedLeft === null) return;
-    if (matchedRight.has(displayIdx)) return;
+    if (selectedLeft === null || matchedRight.has(displayIdx) || advancingRef.current) return;
 
     const leftEl = leftRefs.current[selectedLeft];
     const rightEl = rightRefs.current[displayIdx];
@@ -116,11 +126,33 @@ export default function MatchingScreen({ onBack }: Props) {
       setMatchedLeft(newMatchedLeft);
       setMatchedRight(newMatchedRight);
       setSelectedLeft(null);
-      speak(items[selectedLeft].rightLabel);
+
       if (newMatchedLeft.size === items.length) {
-        setTimeout(() => setDone(true), 700);
+        advancingRef.current = true;
+        const wasCorrect = !hadMistakeRef.current;
+        const newScore: QuizScore = {
+          correct: scoreRef.current.correct + (wasCorrect ? 1 : 0),
+          total: scoreRef.current.total + 1,
+        };
+        scoreRef.current = newScore;
+        setScore(newScore);
+        if (wasCorrect) setShowConfetti(true);
+
+        const phrases = wasCorrect
+          ? buildSuccessPhrases(profile.name, profile.gender)
+          : buildFailurePhrases(profile.name);
+        speak(pickPhrase(phrases), () => {
+          setTimeout(() => {
+            if (newScore.total >= TOTAL_ROUNDS) {
+              onComplete(newScore);
+            } else {
+              startRound(mode!);
+            }
+          }, 400);
+        });
       }
     } else {
+      hadMistakeRef.current = true;
       setLines(prev => [...prev, { id: lineId, x1: lc.x, y1: lc.y, x2: rc.x, y2: rc.y, correct: false }]);
       setWrongRight(displayIdx);
       setTimeout(() => {
@@ -133,11 +165,14 @@ export default function MatchingScreen({ onBack }: Props) {
 
   if (!mode) {
     return (
-      <div className="page page-matching">
-        <BackButton onBack={onBack} />
+      <div className="page page-quiz">
+        <header className="screen-header">
+          <BackButton onBack={onBack} />
+          <h2>Relier</h2>
+          <div />
+        </header>
         <div className="matching-mode-select">
           <div className="matching-title-emoji">🔗</div>
-          <h1 className="matching-h1">Relier</h1>
           <p className="matching-subtitle">Relie les lettres ou les chiffres à leur nom !</p>
           <div className="matching-mode-btns">
             <button className="activity-btn btn-blue" onClick={() => handleModeSelect('letters')}>
@@ -154,34 +189,18 @@ export default function MatchingScreen({ onBack }: Props) {
     );
   }
 
-  if (done) {
-    return (
-      <div className="page page-matching">
-        <div className="matching-done">
-          <div className="matching-done-star">⭐</div>
-          <h2 className="matching-done-title">Bravo !</h2>
-          <p className="matching-done-sub">Tu as tout relié !</p>
-          <div className="matching-done-btns">
-            <button className="activity-btn btn-green" onClick={() => initRound(mode)}>
-              <span className="act-icon">🔄</span>
-              <span>Encore</span>
-            </button>
-            <button className="activity-btn btn-blue" onClick={() => setMode(null)}>
-              <span className="act-icon">↩️</span>
-              <span>Changer</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="page page-matching">
-      <BackButton onBack={onBack} />
+    <div className="page page-quiz">
+      <header className="screen-header">
+        <BackButton onBack={onBack} />
+        <h2>{mode === 'letters' ? 'Lettres' : 'Chiffres'}</h2>
+        <div className="score-display">{score.correct} / {TOTAL_ROUNDS}</div>
+      </header>
+
       <p className="matching-instruction">
         {mode === 'letters' ? 'Relie chaque lettre à son mot !' : 'Relie chaque chiffre à son nom !'}
       </p>
+
       <div className="matching-play-area" ref={containerRef}>
         <svg className="matching-svg" aria-hidden="true">
           {lines.map(line => (
@@ -238,6 +257,8 @@ export default function MatchingScreen({ onBack }: Props) {
           </div>
         </div>
       </div>
+
+      <Confetti active={showConfetti} />
     </div>
   );
 }

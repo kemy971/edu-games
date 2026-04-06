@@ -1350,19 +1350,14 @@ button {
 /* =============================================
    MATCHING GAME (Relier)
    ============================================= */
-.page-matching {
-  align-items: center;
-  justify-content: flex-start;
-  gap: 0;
-  padding: 12px 16px 16px;
-  background: linear-gradient(160deg, #EDF4FF 0%, #E4EDFF 100%);
-}
 
 /* ── Mode selection ── */
 .matching-mode-select {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 20px;
   padding: 24px 16px;
 }
@@ -1371,13 +1366,6 @@ button {
   font-size: 4rem;
   line-height: 1;
   animation: mascot-float 3s ease-in-out infinite;
-}
-
-.matching-h1 {
-  font-size: 2.6rem;
-  font-weight: 900;
-  color: var(--blue-dark);
-  letter-spacing: -1px;
 }
 
 .matching-subtitle {
@@ -1396,11 +1384,12 @@ button {
 
 /* ── Game screen ── */
 .matching-instruction {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--blue-dark);
   text-align: center;
-  margin: 6px 0 14px;
+  margin: 6px 0 10px;
+  flex-shrink: 0;
 }
 
 .matching-play-area {
@@ -1408,6 +1397,7 @@ button {
   flex: 1;
   width: 100%;
   max-width: 560px;
+  align-self: center;
 }
 
 .matching-svg {
@@ -1501,45 +1491,10 @@ button {
   color: var(--text);
 }
 
-/* ── Done screen ── */
-.matching-done {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  height: 100%;
-  padding: 24px;
-}
-
-.matching-done-star {
-  font-size: 5.5rem;
-  line-height: 1;
-  animation: star-pop 0.5s ease forwards;
-}
-
-.matching-done-title {
-  font-size: 2.8rem;
-  font-weight: 900;
-  color: var(--green-dark);
-}
-
-.matching-done-sub {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #555;
-}
-
-.matching-done-btns {
-  display: flex;
-  gap: 16px;
-  margin-top: 12px;
-}
-
 @media (min-width: 600px) {
-  .matching-item-btn   { min-height: 90px; }
-  .matching-left-char  { font-size: 3.2rem; }
+  .matching-item-btn    { min-height: 90px; }
+  .matching-left-char   { font-size: 3.2rem; }
   .matching-right-emoji { font-size: 2.2rem; }
-  .matching-right-word { font-size: 1.3rem; }
-  .matching-col        { gap: 20px; }
+  .matching-right-word  { font-size: 1.3rem; }
+  .matching-col         { gap: 20px; }
 }
