@@ -13,6 +13,23 @@ import explosionAnimation from '../assets/lottie/explosion.json';
 const MAX_MISTAKES = 3;
 const COMBO_LENGTH = 4;
 
+const TREASURES = [
+  { emoji: '💎', name: 'un diamant' },
+  { emoji: '👑', name: 'une couronne' },
+  { emoji: '🏆', name: 'un trophée' },
+  { emoji: '🌟', name: 'une étoile magique' },
+  { emoji: '🦄', name: 'une licorne' },
+  { emoji: '🐉', name: 'un dragon' },
+  { emoji: '🚀', name: 'une fusée' },
+  { emoji: '🍭', name: 'une sucette géante' },
+  { emoji: '🎁', name: 'un cadeau surprise' },
+  { emoji: '🌈', name: 'un arc-en-ciel' },
+  { emoji: '🦋', name: 'un papillon magique' },
+  { emoji: '🎠', name: 'un manège enchanté' },
+  { emoji: '🧸', name: 'un nounours' },
+  { emoji: '🪄', name: 'une baguette magique' },
+];
+
 const SINGLE_DIGIT_NUMBERS = NUMBERS_DATA.filter(n => n.digit <= 9);
 
 interface ComboChar {
@@ -63,6 +80,7 @@ export default function TreasureChestScreen({ profile, onBack, onReplay }: Treas
   const [showConfetti, setShowConfetti] = useState(false);
   const [shakeWrong, setShakeWrong] = useState(false);
   const [feedbackChar, setFeedbackChar] = useState<{ key: string; correct: boolean } | null>(null);
+  const [treasure, setTreasure] = useState<typeof TREASURES[0] | null>(null);
 
   const answeredRef = useRef(false);
 
@@ -75,6 +93,7 @@ export default function TreasureChestScreen({ profile, onBack, onReplay }: Treas
     setChestState('locked');
     setShowConfetti(false);
     setFeedbackChar(null);
+    setTreasure(null);
     answeredRef.current = false;
 
     setTimeout(() => {
@@ -105,7 +124,11 @@ export default function TreasureChestScreen({ profile, onBack, onReplay }: Treas
         answeredRef.current = true;
         setChestState('opened');
         setShowConfetti(true);
-        speak(`Bravo ${profile.name} ! Le coffre est ouvert !`);
+        const picked = TREASURES[Math.floor(Math.random() * TREASURES.length)];
+        setTimeout(() => {
+          setTreasure(picked);
+          speak(`Bravo ${profile.name} ! Tu as trouvé ${picked.name} !`);
+        }, 1200);
       } else {
         setCurrentIndex(nextIndex);
         setTimeout(() => speak(combo[nextIndex].speechText), 400);
@@ -178,6 +201,12 @@ export default function TreasureChestScreen({ profile, onBack, onReplay }: Treas
             <p className="chest-result-text">
               {chestState === 'opened' ? 'Coffre ouvert !' : 'Le coffre est détruit…'}
             </p>
+            {treasure && (
+              <div className="chest-treasure-reveal" onClick={() => speak(`${treasure.name} !`)}>
+                <span className="chest-treasure-emoji">{treasure.emoji}</span>
+                <span className="chest-treasure-name">{treasure.name}</span>
+              </div>
+            )}
             <div className="chest-end-buttons">
               <button className="menu-btn btn-green" onClick={onReplay}>
                 <span className="btn-icon">🔄</span>
