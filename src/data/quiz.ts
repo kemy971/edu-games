@@ -1,5 +1,5 @@
 import type { Question, LetterData, NumberData } from '../types';
-import { ALPHABET_DATA } from './alphabet';
+import { ALPHABET_DATA, pickLetterVariant } from './alphabet';
 import { NUMBERS_DATA } from './numbers';
 
 export const QUIZ_CONFIG = {
@@ -49,7 +49,10 @@ export function generateLetterQuestion(excludeKeys: string[] = []): Question {
   const source = pool.length > 0 ? pool : ALPHABET_DATA;
   const target = shuffleArray([...source])[0] as LetterData;
   const distractors = pickRandom(ALPHABET_DATA, [target], QUIZ_CONFIG.choicesPerQuestion - 1) as LetterData[];
-  const choices = shuffleArray([target, ...distractors]);
+  const choices = shuffleArray([target, ...distractors]).map(letter => {
+    const variant = pickLetterVariant(letter);
+    return { ...letter, emoji: variant.emoji, word: variant.word, article: variant.article };
+  });
   return {
     type: 'letter',
     prompt: `Clique sur la lettre ${target.key}`,
