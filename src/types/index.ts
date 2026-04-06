@@ -30,7 +30,8 @@ export type Screen =
   | 'tracing'
   | 'more-or-less'
   | 'ten-frame'
-  | 'treasure-chest';
+  | 'treasure-chest'
+  | 'matching';
 export type QuizMode = 'letters' | 'numbers' | 'mixed';
 
 export type Question =

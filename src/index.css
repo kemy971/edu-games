@@ -289,6 +289,7 @@ button {
 .btn-teal   { background: linear-gradient(135deg, var(--teal),   var(--teal-dark)); }
 .btn-coral  { background: linear-gradient(135deg, var(--coral),  var(--coral-dark)); }
 .btn-yellow { background: linear-gradient(135deg, var(--yellow), #E8B800); color: #5a4000; }
+.btn-sky    { background: linear-gradient(135deg, #38BDF8, #0EA5E9); }
 
 /* =============================================
    ACTIVITY GRID (new menu layout)
@@ -1344,4 +1345,201 @@ button {
   .chest-lottie     { width: 200px; height: 200px; }
   .chest-keyboard   { max-width: 480px; }
   .chest-key        { font-size: 1.3rem; }
+}
+
+/* =============================================
+   MATCHING GAME (Relier)
+   ============================================= */
+.page-matching {
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0;
+  padding: 12px 16px 16px;
+  background: linear-gradient(160deg, #EDF4FF 0%, #E4EDFF 100%);
+}
+
+/* ── Mode selection ── */
+.matching-mode-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 16px;
+}
+
+.matching-title-emoji {
+  font-size: 4rem;
+  line-height: 1;
+  animation: mascot-float 3s ease-in-out infinite;
+}
+
+.matching-h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--blue-dark);
+  letter-spacing: -1px;
+}
+
+.matching-subtitle {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+  max-width: 300px;
+}
+
+.matching-mode-btns {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+/* ── Game screen ── */
+.matching-instruction {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--blue-dark);
+  text-align: center;
+  margin: 6px 0 14px;
+}
+
+.matching-play-area {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  max-width: 560px;
+}
+
+.matching-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.matching-columns {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0 4px;
+}
+
+.matching-col {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+  width: 43%;
+}
+
+.matching-item-btn {
+  width: 100%;
+  min-height: 74px;
+  border-radius: 20px;
+  border: 3px solid #ddd;
+  background: #fff;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s ease, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.matching-item-btn:not(.matched):active {
+  transform: scale(0.94);
+}
+
+.matching-left-btn.selected {
+  border-color: var(--blue);
+  background: #EEF5FF;
+  box-shadow: 0 0 0 4px rgba(77, 166, 255, 0.3), var(--shadow);
+}
+
+.matching-item-btn.matched {
+  border-color: var(--green);
+  background: #F0FFF4;
+  cursor: default;
+}
+
+.matching-item-btn.wrong {
+  border-color: var(--red);
+  animation: matching-shake 0.45s ease;
+}
+
+@keyframes matching-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  50%       { transform: translateX(8px); }
+  75%       { transform: translateX(-4px); }
+}
+
+.matching-left-char {
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: var(--blue-dark);
+  line-height: 1;
+}
+
+.matching-right-btn {
+  padding: 0 10px;
+}
+
+.matching-right-emoji {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.matching-right-word {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text);
+}
+
+/* ── Done screen ── */
+.matching-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 100%;
+  padding: 24px;
+}
+
+.matching-done-star {
+  font-size: 5.5rem;
+  line-height: 1;
+  animation: star-pop 0.5s ease forwards;
+}
+
+.matching-done-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: var(--green-dark);
+}
+
+.matching-done-sub {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.matching-done-btns {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+@media (min-width: 600px) {
+  .matching-item-btn   { min-height: 90px; }
+  .matching-left-char  { font-size: 3.2rem; }
+  .matching-right-emoji { font-size: 2.2rem; }
+  .matching-right-word { font-size: 1.3rem; }
+  .matching-col        { gap: 20px; }
 }
