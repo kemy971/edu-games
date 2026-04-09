@@ -40,7 +40,9 @@ export default function NumbersScreen({ onBack }: NumbersScreenProps) {
             <span className="card-digit">{num.digit}</span>
             <span className="card-name">{num.name}</span>
             <div className="card-emoji-row">
-              {Array(num.digit).fill(emojis[i]).join('')}
+              {Array.from({ length: num.digit }, (_, j) => (
+                <span key={j}>{emojis[i]}</span>
+              ))}
             </div>
           </div>
         ))}
