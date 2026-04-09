@@ -1,12 +1,21 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useVoiceName } from '../context/VoiceContext';
 
 export function useSpeech() {
-  const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
+  const { voiceName } = useVoiceName();
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([]);
+  const voiceNameRef = useRef(voiceName);
+  const [frenchVoices, setFrenchVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  useEffect(() => {
+    voiceNameRef.current = voiceName;
+  }, [voiceName]);
 
   useEffect(() => {
     const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      voiceRef.current = voices.find(v => v.lang.startsWith('fr')) ?? null;
+      const voices = window.speechSynthesis.getVoices().filter(v => v.lang.startsWith('fr'));
+      voicesRef.current = voices;
+      setFrenchVoices(voices);
     };
     loadVoices();
     window.speechSynthesis.addEventListener('voiceschanged', loadVoices);
@@ -27,7 +36,12 @@ export function useSpeech() {
     utterance.rate = 0.82;
     utterance.pitch = 1.1;
     utterance.volume = 1.0;
-    if (voiceRef.current) utterance.voice = voiceRef.current;
+
+    const resolved =
+      voicesRef.current.find(v => v.name === voiceNameRef.current) ??
+      voicesRef.current[0] ??
+      null;
+    if (resolved) utterance.voice = resolved;
 
     // Chrome bug workaround: speech can cut out on long sentences
     const resumeHack = setInterval(() => {
@@ -50,5 +64,5 @@ export function useSpeech() {
     window.speechSynthesis?.cancel();
   }, []);
 
-  return { speak, cancel };
+  return { speak, cancel, frenchVoices };
 }

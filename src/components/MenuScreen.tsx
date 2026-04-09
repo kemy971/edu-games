@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ChildProfile } from '../types';
+import VoicePicker from './VoicePicker';
 
 const BG_ITEMS = [
   { char: 'A', left:  '5%', size: '3.2rem', duration: '20s', delay:  '0s'  },
@@ -63,6 +64,7 @@ export default function MenuScreen({
 
   return (
     <div className="page page-menu">
+      <VoicePicker />
       <div className="menu-bg" aria-hidden="true">
         {BG_ITEMS.map((item, i) => (
           <span
