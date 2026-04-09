@@ -136,7 +136,7 @@ export default function TenFrameScreen({ profile, onComplete, onBack }: TenFrame
       </div>
 
       <button
-        className={`tf-validate-btn ${filledCount === round.target ? 'tf-validate-ready' : ''}`}
+        className={`tf-validate-btn ${filledCount > 0 && !validated ? 'tf-validate-ready' : ''}`}
         onClick={handleValidate}
         disabled={validated || filledCount === 0}
       >
