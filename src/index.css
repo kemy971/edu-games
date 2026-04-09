@@ -1263,9 +1263,9 @@ button {
 }
 
 .tf-validate-btn.tf-validate-ready {
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
   color: #fff;
-  box-shadow: 0 4px 14px rgba(75,175,90,0.4);
+  box-shadow: 0 4px 14px rgba(66,133,244,0.4);
 }
 
 .tf-validate-btn.tf-validate-ready:active { transform: scale(0.96); }
