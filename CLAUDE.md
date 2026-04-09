@@ -47,6 +47,63 @@ The preview server is configured in `.claude/launch.json` under the name `edugam
 - `numbers.ts` — 10 entries `{ key, digit, name, emoji }`. Each digit has a distinct fruit emoji.
 - `quiz.ts` — shared config (`QUIZ_CONFIG`: 5 questions, 4 choices, 400 ms speech delay), feedback phrases, `shuffleArray`, `pickRandom`, question generators, `pickPhrase`.
 
+### Game template
+
+Every game screen MUST follow these structural rules:
+
+#### 1. Header (always present)
+
+```jsx
+<header className="screen-header">
+  <BackButton onBack={onBack} />   {/* always first — navigates back to menu */}
+  <h2>Titre du jeu</h2>            {/* always centered */}
+  <div className="score-display">  {/* scored games: "correct / total" */}
+    {score.correct} / {QUIZ_CONFIG.questionsPerRound}
+  </div>
+  {/* — OR — for non-scored games: */}
+  <div className="header-spacer" />
+</header>
+```
+
+`.screen-header` is a 3-column CSS grid (`1fr auto 1fr`). The back button sits in column 1 (`justify-self: start`), the title in column 2 (centered), and the right slot in column 3 (`justify-self: end`). Never omit the third column element — use `.header-spacer` if there is nothing to show.
+
+#### 2. End of game (always two actions)
+
+When a game ends, the player MUST be offered exactly two choices:
+
+| Action | Button class | Icon | Label |
+|--------|-------------|------|-------|
+| Replay | `menu-btn btn-green` | 🔄 | Rejouer |
+| Home   | `menu-btn btn-blue`  | 🏠 | Menu   |
+
+**Scored games** delegate this to `SummaryScreen` automatically via `onComplete(score)`.
+
+**Non-scored / inline-end games** must render it themselves:
+
+```jsx
+<div className="chest-end-buttons">   {/* or any wrapper */}
+  <button className="menu-btn btn-green" onClick={onReplay}>
+    <span className="btn-icon">🔄</span><span>Rejouer</span>
+  </button>
+  <button className="menu-btn btn-blue" onClick={onBack}>
+    <span className="btn-icon">🏠</span><span>Menu</span>
+  </button>
+</div>
+```
+
+`onReplay` should reset all local state (or the parent can increment `activityKey` to force a full remount).
+
+#### 3. Page wrapper
+
+```jsx
+<div className="page page-{name}">   {/* flex column, 100dvh */}
+  <header className="screen-header">…</header>
+  {/* game content */}
+</div>
+```
+
+Add a matching `/* === GameName === */` section in `src/index.css` with the `.page-{name}` background gradient.
+
 ### Activity patterns
 
 All scored activities share the same pattern:
