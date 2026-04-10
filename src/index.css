@@ -787,22 +787,26 @@ button {
   gap: 12px;
   padding: 14px;
   overflow-y: auto;
+  align-content: start;
   flex: 1;
 }
 
 .numbers-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
   gap: 12px;
   padding: 14px;
   overflow-y: auto;
   flex: 1;
 }
 
+.numbers-grid > .card {
+  flex: 1 0 140px;
+}
+
 @media (min-width: 480px) {
-  .numbers-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  }
+  /* flex-basis: 140px already gives auto columns */
 }
 
 /* =============================================
@@ -850,7 +854,7 @@ button {
   max-width: 100%;
   width: 100%;
   margin-top: 4px;
-  overflow: hidden;
+  line-height: 1.4;
 }
 
 /* =============================================
@@ -1032,9 +1036,11 @@ button {
     padding: 20px;
   }
   .numbers-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 16px;
     padding: 20px;
+  }
+  .numbers-grid > .card {
+    flex-basis: 160px;
   }
   .card        { min-height: 120px; }
   .card-letter { font-size: 3rem; }
@@ -1053,7 +1059,7 @@ button {
    ============================================= */
 @media (min-width: 900px) {
   .alphabet-grid  { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-  .numbers-grid   { grid-template-columns: repeat(5, 1fr); }
+  .numbers-grid > .card { flex-basis: calc(20% - 10px); }
 }
 
 @media (max-width: 380px) {
