@@ -120,7 +120,7 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
           setPhase('success');
           setShowConfetti(true);
           const phrase = SUCCESS_PHRASES[Math.floor(Math.random() * SUCCESS_PHRASES.length)];
-          speak(phrase);
+          speak(letter, () => speak(phrase));
 
           autoAdvanceRef.current = window.setTimeout(() => {
             cancel();
@@ -133,11 +133,14 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
               startWord(nextIdx);
             }
           }, 2900);
+        } else {
+          // Correct but not last letter — speak the letter
+          speak(letter);
         }
       } else {
-        // Wrong letter
+        // Wrong letter — speak it then prompt to retry
         triggerShake();
-        speak('Essaie encore !');
+        speak(letter, () => speak('Essaie encore !'));
       }
     },
     [words, speak, cancel, startWord, triggerShake]
