@@ -31,7 +31,8 @@ export type Screen =
   | 'more-or-less'
   | 'ten-frame'
   | 'treasure-chest'
-  | 'matching';
+  | 'matching'
+  | 'word-spelling';
 export type QuizMode = 'letters' | 'numbers' | 'mixed';
 
 export type Question =

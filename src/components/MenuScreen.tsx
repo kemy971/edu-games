@@ -39,13 +39,14 @@ interface MenuScreenProps {
   onTenFrame: () => void;
   onTreasureChest: () => void;
   onMatching: () => void;
+  onWordSpelling: () => void;
 }
 
 export default function MenuScreen({
   profile,
   onAlphabet, onNumbers,
   onMemory, onPhonics, onSubitizing, onTracing: _onTracing,
-  onMoreOrLess, onTenFrame, onTreasureChest, onMatching,
+  onMoreOrLess, onTenFrame, onTreasureChest, onMatching, onWordSpelling,
 }: MenuScreenProps) {
   const [mascot, setMascot] = useState(() => {
     try {
@@ -147,6 +148,10 @@ export default function MenuScreen({
         <button className="activity-btn btn-sky" onClick={onMatching}>
           <span className="act-icon">🔗</span>
           <span>Relier</span>
+        </button>
+        <button className="activity-btn btn-lime wide" onClick={onWordSpelling}>
+          <span className="act-icon">✏️</span>
+          <span>Épeler les Mots</span>
         </button>
       </div>
     </div>
