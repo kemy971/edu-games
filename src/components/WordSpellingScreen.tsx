@@ -203,7 +203,7 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
       <div className="spelling-content">
         <button className="spelling-word-display" onClick={speakWord} aria-label={`Écouter ${word.word}`}>
           <span className="spelling-emoji">{word.emoji}</span>
-          <span className="spelling-label">{word.word}</span>
+          <span className="spelling-label">{word.word.toUpperCase()}</span>
           <span className="spelling-listen-hint">🔊</span>
         </button>
 
