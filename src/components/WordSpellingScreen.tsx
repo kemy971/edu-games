@@ -8,6 +8,19 @@ import Confetti from './Confetti';
 
 const WORDS_PER_ROUND = 8;
 
+// Map each character to a spoken hint, e.g. "C, comme Chat"
+const LETTER_HINT: Record<string, string> = {};
+for (const entry of ALPHABET_DATA) {
+  LETTER_HINT[entry.key] = `${entry.key}, comme ${entry.word}`;
+}
+LETTER_HINT['É'] = 'É, comme éléphant';
+LETTER_HINT['È'] = 'È, comme zèbre';
+LETTER_HINT['Î'] = 'Î, comme île';
+
+function getLetterHint(letter: string): string {
+  return LETTER_HINT[letter] ?? letter;
+}
+
 const KEYBOARD_ROWS = [
   ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],
   ['J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R'],
@@ -87,7 +100,12 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
       setTyped([]);
       setPhase('playing');
       setShowConfetti(false);
-      setTimeout(() => speak(word.word), 400);
+      const wordUpper = word.word.toUpperCase();
+      setTimeout(() => {
+        speak(word.word, () => {
+          setTimeout(() => speak(getLetterHint(wordUpper[0])), 350);
+        });
+      }, 400);
     },
     [words, speak]
   );
@@ -134,13 +152,15 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
             }
           }, 2900);
         } else {
-          // Correct but not last letter — speak the letter
-          speak(letter);
+          // Correct but not last letter — speak letter then hint for next
+          const nextHint = getLetterHint(wordUpper[newTyped.length]);
+          speak(letter, () => setTimeout(() => speak(nextHint), 350));
         }
       } else {
-        // Wrong letter — speak it then prompt to retry
+        // Wrong letter — speak it, prompt to retry, then replay the hint
         triggerShake();
-        speak(letter, () => speak('Essaie encore !'));
+        const hint = getLetterHint(expected);
+        speak(letter, () => speak('Essaie encore !', () => setTimeout(() => speak(hint), 300)));
       }
     },
     [words, speak, cancel, startWord, triggerShake]
@@ -217,20 +237,25 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
           onAnimationEnd={() => slotsRef.current?.classList.remove('spelling-shake')}
           style={{ '--word-len': wordLetters.length } as React.CSSProperties}
         >
-          {wordLetters.map((_, i) => (
-            <div
-              key={i}
-              className={`spelling-slot ${
-                i < typed.length
-                  ? 'slot-filled'
-                  : i === typed.length
-                    ? 'slot-current'
-                    : 'slot-empty'
-              }`}
-            >
-              {i < typed.length ? typed[i] : ''}
-            </div>
-          ))}
+          {wordLetters.map((letter, i) => {
+            const isCurrent = i === typed.length && phase === 'playing';
+            return (
+              <div
+                key={i}
+                className={`spelling-slot ${
+                  i < typed.length
+                    ? 'slot-filled'
+                    : isCurrent
+                      ? 'slot-current'
+                      : 'slot-empty'
+                }`}
+                onClick={isCurrent ? () => speak(getLetterHint(letter)) : undefined}
+                style={isCurrent ? { cursor: 'pointer' } : undefined}
+              >
+                {i < typed.length ? typed[i] : isCurrent ? '?' : '•'}
+              </div>
+            );
+          })}
         </div>
       </div>
 
