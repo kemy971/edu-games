@@ -8,14 +8,14 @@ import Confetti from './Confetti';
 
 const WORDS_PER_ROUND = 8;
 
-// Map each character to a spoken hint, e.g. "C, comme Chat"
+// Map each character to a spoken hint, e.g. "c, comme Chat"
 const LETTER_HINT: Record<string, string> = {};
 for (const entry of ALPHABET_DATA) {
-  LETTER_HINT[entry.key] = `${entry.key}, comme ${entry.word}`;
+  LETTER_HINT[entry.key] = `${entry.key.toLowerCase()}, comme ${entry.word}`;
 }
-LETTER_HINT['É'] = 'É, comme éléphant';
-LETTER_HINT['È'] = 'È, comme zèbre';
-LETTER_HINT['Î'] = 'Î, comme île';
+LETTER_HINT['É'] = 'é, comme éléphant';
+LETTER_HINT['È'] = 'è, comme zèbre';
+LETTER_HINT['Î'] = 'î, comme île';
 
 function getLetterHint(letter: string): string {
   return LETTER_HINT[letter] ?? letter;
@@ -138,7 +138,7 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
           setPhase('success');
           setShowConfetti(true);
           const phrase = SUCCESS_PHRASES[Math.floor(Math.random() * SUCCESS_PHRASES.length)];
-          speak(letter, () => speak(phrase));
+          speak(letter.toLowerCase(), () => speak(phrase));
 
           autoAdvanceRef.current = window.setTimeout(() => {
             cancel();
@@ -154,13 +154,13 @@ export default function WordSpellingScreen({ profile: _profile, onBack, onReplay
         } else {
           // Correct but not last letter — speak letter then hint for next
           const nextHint = getLetterHint(wordUpper[newTyped.length]);
-          speak(letter, () => setTimeout(() => speak(nextHint), 350));
+          speak(letter.toLowerCase(), () => setTimeout(() => speak(nextHint), 350));
         }
       } else {
         // Wrong letter — speak it, prompt to retry, then replay the hint
         triggerShake();
         const hint = getLetterHint(expected);
-        speak(letter, () => speak('Essaie encore !', () => setTimeout(() => speak(hint), 300)));
+        speak(letter.toLowerCase(), () => speak('Essaie encore !', () => setTimeout(() => speak(hint), 300)));
       }
     },
     [words, speak, cancel, startWord, triggerShake]
