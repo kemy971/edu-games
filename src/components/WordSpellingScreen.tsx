@@ -6,7 +6,7 @@ import type { ChildProfile } from '../types';
 import BackButton from './BackButton';
 import Confetti from './Confetti';
 
-const WORDS_PER_ROUND = 8;
+const WORDS_PER_ROUND = 5;
 
 // Map each character to a spoken hint, e.g. "c, comme Chat"
 const LETTER_HINT: Record<string, string> = {};
