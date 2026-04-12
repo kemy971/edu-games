@@ -15,6 +15,7 @@ import MoreOrLessScreen from './components/MoreOrLessScreen';
 import TenFrameScreen from './components/TenFrameScreen';
 import TreasureChestScreen from './components/TreasureChestScreen';
 import MatchingScreen from './components/MatchingScreen';
+import WordSpellingScreen from './components/WordSpellingScreen';
 
 interface AppState {
   screen: Screen;
@@ -87,6 +88,7 @@ export default function App() {
           onTenFrame={() => startActivity('ten-frame')}
           onTreasureChest={() => startActivity('treasure-chest')}
           onMatching={() => startActivity('matching')}
+          onWordSpelling={() => startActivity('word-spelling')}
         />
       );
 
@@ -173,6 +175,16 @@ export default function App() {
           profile={profile}
           onComplete={score => showSummary(score, 'matching')}
           onBack={() => goTo('menu')}
+        />
+      );
+
+    case 'word-spelling':
+      return (
+        <WordSpellingScreen
+          key={state.activityKey}
+          profile={profile}
+          onBack={() => goTo('menu')}
+          onReplay={() => startActivity('word-spelling')}
         />
       );
 
